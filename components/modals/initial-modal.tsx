@@ -2,6 +2,8 @@
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+
 import {
 	Dialog,
 	DialogContent,
@@ -10,6 +12,7 @@ import {
 	DialogHeader,
 	DialogTitle
 } from '@/components/ui/dialog'
+
 import {
 	Form,
 	FormControl,
@@ -20,11 +23,14 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
+import { FileUpload } from '@/components/file-upload'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 interface initialModalProps {}
 export const InitialModal: React.FC<initialModalProps> = () => {
 	const [isMounted, setIsMounted] = useState(false)
+	const router = useRouter()
 	useEffect(() => {
 		setIsMounted(true)
 	}, [])
@@ -42,7 +48,14 @@ export const InitialModal: React.FC<initialModalProps> = () => {
 	})
 	const isLoading = form.formState.isSubmitting
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
-		console.log(values)
+		try {
+			await axios.post('/api/servers', values)
+			form.reset()
+			router.refresh()
+			window.location.reload()
+		} catch (err) {
+			console.log(err)
+		}
 	}
 	if (!isMounted) return null
 	return (
@@ -61,7 +74,21 @@ export const InitialModal: React.FC<initialModalProps> = () => {
 					<form className='spacey-y-8' onSubmit={form.handleSubmit(onSubmit)}>
 						<div className='space-y-8 px-6'>
 							<div className='grid place-content-center'>
-								TODO: Image Upload
+								<FormField
+									control={form.control}
+									render={({ field }) => (
+										<FormItem>
+											<FormControl>
+												<FileUpload
+													endpoint='serverImage'
+													value={field.value}
+													onChange={field.onChange}
+												/>
+											</FormControl>
+										</FormItem>
+									)}
+									name='imageUrl'
+								/>
 							</div>
 							<FormField
 								control={form.control}
