@@ -1,5 +1,4 @@
 import { db } from '@/lib/db'
-import { redirect } from 'next/navigation'
 
 import { currentProfile } from '@/lib/current-profile'
 
@@ -12,7 +11,6 @@ import { UserButton } from '@clerk/nextjs'
 
 export async function NavigationSidebar() {
 	const profile = await currentProfile()
-	if (!profile) return redirect('/')
 	const severs = await db.server.findMany({
 		where: { members: { some: { profileId: profile?.id } } }
 	})

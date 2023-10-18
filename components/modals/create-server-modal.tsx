@@ -2,7 +2,6 @@
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useEffect, useState } from 'react'
 
 import {
 	Dialog,
@@ -26,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { FileUpload } from '@/components/file-upload'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { useModal } from '@/hooks/use-modal-store'
 
 const formSchema = z.object({
 	name: z.string().min(1, {
@@ -35,30 +35,31 @@ const formSchema = z.object({
 		message: 'Server imageUrl is required'
 	})
 })
-export const InitialModal = () => {
-	const [isMounted, setIsMounted] = useState(false)
+export const CreateServerModal = () => {
+	const { isOpen, onOpen, type, onClose } = useModal()
+	const isModalOpen: boolean = isOpen && type === 'createServer'
 	const router = useRouter()
-	useEffect(() => {
-		setIsMounted(true)
-	}, [])
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: { name: '', imageUrl: '' }
 	})
 	const isLoading = form.formState.isSubmitting
+	const handleClose = () => {
+		form.reset()
+		onClose()
+	}
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
 			await axios.post('/api/servers', values)
-			form.reset()
+			handleClose()
 			router.refresh()
-			window.location.reload()
 		} catch (err) {
 			console.log(err)
 		}
 	}
-	if (!isMounted) return null
+
 	return (
-		<Dialog open>
+		<Dialog open={isModalOpen} onOpenChange={handleClose}>
 			<DialogContent className='bg-white text-black p-0 overflow-hidden'>
 				<DialogHeader className='pt-8 px-6'>
 					<DialogTitle className='text-2xl text-center font-bold'>
