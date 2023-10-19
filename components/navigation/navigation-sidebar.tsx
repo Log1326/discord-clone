@@ -8,9 +8,11 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { NavigationItem } from '@/components/navigation/navigation-item'
 import { ModeToggle } from '@/components/mode-toggle'
 import { UserButton } from '@clerk/nextjs'
+import { redirect } from 'next/navigation'
 
 export async function NavigationSidebar() {
 	const profile = await currentProfile()
+	if (!profile) return redirect('/')
 	const severs = await db.server.findMany({
 		where: { members: { some: { profileId: profile?.id } } }
 	})

@@ -17,6 +17,7 @@ import {
 	User,
 	UserPlus
 } from 'lucide-react'
+import { useModal } from '@/hooks/use-modal-store'
 
 interface ServerHeaderProps {
 	server: ServerWithMembersWithProfiles
@@ -24,6 +25,7 @@ interface ServerHeaderProps {
 }
 export const ServerHeader: React.FC<ServerHeaderProps> = props => {
 	const { role, server } = props
+	const { onOpen } = useModal()
 	const isAdmin = role === MemberRole.ADMIN
 	const isModerator = isAdmin || role === MemberRole.MODERATOR
 	return (
@@ -46,7 +48,7 @@ export const ServerHeader: React.FC<ServerHeaderProps> = props => {
 				{isModerator && (
 					<>
 						<DropdownMenuItem
-							onClick={() => alert('hello')}
+							onClick={() => onOpen('invite', { server })}
 							className='text-indigo-600 dark:text-indigo-400 px-3 py-2 text-sm cursor-pointer'
 						>
 							Invite People <UserPlus className='h-4 w-4 ml-auto' />
@@ -58,10 +60,16 @@ export const ServerHeader: React.FC<ServerHeaderProps> = props => {
 				)}
 				{isAdmin && (
 					<>
-						<DropdownMenuItem className='px-3	py-2 text-sm cursor-pointer'>
+						<DropdownMenuItem
+							onClick={() => onOpen('editServer', { server })}
+							className='px-3	py-2 text-sm cursor-pointer'
+						>
 							Server settings <Settings className='h-4 w-4 ml-auto' />
 						</DropdownMenuItem>
-						<DropdownMenuItem className='px-3	py-2 text-sm cursor-pointer'>
+						<DropdownMenuItem
+							onClick={() => onOpen('members', { server })}
+							className='px-3	py-2 text-sm cursor-pointer'
+						>
 							Manage Members <User className='h-4 w-4 ml-auto' />
 						</DropdownMenuItem>
 					</>
@@ -72,7 +80,7 @@ export const ServerHeader: React.FC<ServerHeaderProps> = props => {
 						Delete Channel <Trash className='h-4 w-4 ml-auto' />
 					</DropdownMenuItem>
 				)}
-				{isAdmin && (
+				{!isAdmin && (
 					<DropdownMenuItem className='px-3 py-2 text-sm cursor-pointer'>
 						Leave Server <LogOut className='h-4 w-4 ml-auto' />
 					</DropdownMenuItem>
