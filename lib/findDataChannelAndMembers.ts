@@ -2,9 +2,11 @@ import { currentProfile } from '@/lib/current-profile'
 import { db } from '@/lib/db'
 import { ChannelType } from '@prisma/client'
 import { redirect } from 'next/navigation'
+import { redirectToSignIn } from '@clerk/nextjs'
 
 export async function findDataChannelAndMembers(serverId: string) {
 	const profile = await currentProfile()
+	if (!profile) return redirectToSignIn()
 	const server = await db.server.findUnique({
 		where: { id: serverId },
 		include: {

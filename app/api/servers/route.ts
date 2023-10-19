@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 	try {
 		const { name, imageUrl } = await req.json()
 		const profile = await currentProfile()
-		if (!profile) nextError('Unauthorized', { status: 401 })
+		if (!profile) return nextError('Unauthorized')
 		const server = await db.server.create({
 			data: {
 				profileId: String(profile?.id),
@@ -28,6 +28,6 @@ export async function POST(req: Request) {
 		return NextResponse.json(server)
 	} catch (err) {
 		console.log(err, '[SERVERS_POST]')
-		nextError('Internal Error', { status: 500 })
+		return nextError('Internal Error')
 	}
 }

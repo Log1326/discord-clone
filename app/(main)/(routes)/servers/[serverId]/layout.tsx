@@ -18,7 +18,7 @@ export default async function ServerIdLayout({
 }) {
 	const profile = await currentProfile()
 	const server = await db.server.findUnique({
-		where: { id: serverId, members: { some: { profileId: profile.id } } }
+		where: { id: serverId, members: { some: { profileId: profile?.id } } }
 	})
 	if (!server) return redirect('/')
 	return (
