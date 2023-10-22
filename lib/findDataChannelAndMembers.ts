@@ -23,7 +23,7 @@ export async function findDataChannelAndMembers(serverId: string) {
 	const videoChannels = server?.channels.filter(
 		channel => channel.type === ChannelType.VIDEO
 	)
-	const members = server?.members.find(
+	const members = server?.members.filter(
 		member => member.profileId !== profile.id
 	)
 	if (!server) redirect('/')

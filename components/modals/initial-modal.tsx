@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import * as React from 'react'
 import { useEffect, useState } from 'react'
 
 import {
@@ -24,19 +25,19 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { FileUpload } from '@/components/file-upload'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
+import axios from 'axios'
 
 const formSchema = z.object({
 	name: z.string().min(1, {
 		message: 'Server name is required'
 	}),
-	imageUrl: z.string().min(1, {
-		message: 'Server imageUrl is required'
-	})
+	imageUrl: z.string()
 })
 export const InitialModal = () => {
 	const [isMounted, setIsMounted] = useState(false)
+	const [isShow, setIsShow] = useState(false)
 	const router = useRouter()
 	useEffect(() => {
 		setIsMounted(true)
@@ -48,6 +49,7 @@ export const InitialModal = () => {
 	const isLoading = form.formState.isSubmitting
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
+			if (isShow) return router.push(values.name)
 			await axios.post('/api/servers', values)
 			form.reset()
 			router.refresh()
@@ -74,6 +76,7 @@ export const InitialModal = () => {
 						<div className='space-y-8 px-6'>
 							<div className='grid place-content-center'>
 								<FormField
+									name='imageUrl'
 									control={form.control}
 									render={({ field }) => (
 										<FormItem>
@@ -86,36 +89,92 @@ export const InitialModal = () => {
 											</FormControl>
 										</FormItem>
 									)}
-									name='imageUrl'
 								/>
 							</div>
 							<FormField
+								name='name'
 								control={form.control}
 								render={({ field }) => (
-									<FormItem>
-										<FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70'>
-											Server name
-										</FormLabel>
-										<FormControl>
-											<Input
-												disabled={isLoading}
-												className='bg-zinc-300/50 border-0 focus-visible:ring-0 text-black
+									<>
+										{isShow ? (
+											<FormItem>
+												<FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70'>
+													Put your link
+												</FormLabel>
+												<FormControl>
+													<Input
+														type='url'
+														disabled={isLoading}
+														className='bg-zinc-300/50 border-0 focus-visible:ring-0 text-black
 												focus-visible:ring-offset-0
 												'
-												placeholder='Enter server name'
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
+														placeholder='link...'
+														{...field}
+													/>
+												</FormControl>
+											</FormItem>
+										) : (
+											<FormItem>
+												<FormLabel className='uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70'>
+													Server name
+												</FormLabel>
+												<FormControl>
+													<Input
+														disabled={isLoading}
+														className='bg-zinc-300/50 border-0 focus-visible:ring-0 text-black
+												focus-visible:ring-offset-0
+												'
+														placeholder='Enter server name'
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									</>
 								)}
-								name='name'
 							/>
 						</div>
 						<DialogFooter className='bg-gray-100 px-6 py-4'>
-							<Button variant='primary' disabled={isLoading}>
-								Create
-							</Button>
+							<div className='flex items-center justify-between w-full'>
+								{isShow ? (
+									<>
+										<Button
+											variant='ghost'
+											onClick={() => setIsShow(false)}
+											disabled={isLoading}
+										>
+											Back
+										</Button>
+
+										<Button variant='primary' disabled={isLoading}>
+											Connect
+											{isLoading && (
+												<Loader2 className='text-white ml-2 transition duration-300 animate-spin h-4 w-4' />
+											)}
+										</Button>
+									</>
+								) : (
+									<>
+										<Button
+											onClick={event => {
+												event.preventDefault()
+												setIsShow(true)
+											}}
+											variant='ghost'
+											disabled={isLoading}
+										>
+											Join with link
+										</Button>
+										<Button variant='primary' disabled={isLoading}>
+											Create
+											{isLoading && (
+												<Loader2 className='text-white ml-2 transition duration-300 animate-spin h-4 w-4' />
+											)}
+										</Button>
+									</>
+								)}
+							</div>
 						</DialogFooter>
 					</form>
 				</Form>
