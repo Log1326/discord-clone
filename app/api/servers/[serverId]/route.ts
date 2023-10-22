@@ -22,3 +22,17 @@ export async function PATCH(req: Request, { params: { serverId } }: Params) {
 		return nextError('Internal Error')
 	}
 }
+export async function DELETE(req: Request, { params: { serverId } }: Params) {
+	try {
+		const profile = await currentProfile()
+		if (!profile) return nextError('Unauthorized')
+		const server = await db.server.delete({
+			where: { id: serverId, profileId: profile.id }
+		})
+		if (!server) return nextError('Server ID Missing')
+		return NextResponse.json(server)
+	} catch (err) {
+		console.log(err, 'SERVER_ID_DELETE')
+		return nextError('Internal Error')
+	}
+}

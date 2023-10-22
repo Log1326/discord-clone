@@ -75,6 +75,7 @@ export const CreateServerModal = () => {
 						<div className='space-y-8 px-6'>
 							<div className='grid place-content-center'>
 								<FormField
+									name='imageUrl'
 									control={form.control}
 									render={({ field }) => (
 										<FormItem>
@@ -87,7 +88,6 @@ export const CreateServerModal = () => {
 											</FormControl>
 										</FormItem>
 									)}
-									name='imageUrl'
 								/>
 							</div>
 							<FormField

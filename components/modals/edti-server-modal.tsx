@@ -29,7 +29,9 @@ import {
 	FormLabel,
 	FormMessage
 } from '@/components/ui/form'
+import * as React from 'react'
 import { useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
 
 const formSchema = z.object({
 	name: z.string().min(1, {
@@ -129,6 +131,9 @@ export const EditServerModal = () => {
 						<DialogFooter className='bg-gray-100 px-6 py-4'>
 							<Button variant='primary' disabled={isLoading}>
 								Save
+								{isLoading && (
+									<Loader2 className='text-white ml-2 transition duration-300 animate-spin h-4 w-4' />
+								)}
 							</Button>
 						</DialogFooter>
 					</form>

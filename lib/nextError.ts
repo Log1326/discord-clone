@@ -5,6 +5,7 @@ type MessageType =
 	| 'Unauthorized'
 	| 'Server ID Missing'
 	| 'Member ID Missing'
+	| 'Name cannot be general'
 interface Init {
 	body?: BodyInit
 	init?: ResponseInit
@@ -16,7 +17,8 @@ const errorOptions: Record<MessageType, Init> = {
 	Unauthorized: fn('Unauthorized', { status: 401 }),
 	'Internal Error': fn('Internal Error', { status: 500 }),
 	'Server ID Missing': fn('Server ID Missing', { status: 400 }),
-	'Member ID Missing': fn('Member ID Missing', { status: 400 })
+	'Member ID Missing': fn('Member ID Missing', { status: 400 }),
+	'Name cannot be general': fn('Name cannot be general', { status: 400 })
 }
 export const nextError = (message: MessageType) => {
 	const err = errorOptions[message]
