@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { ModalType, useModal } from '@/hooks/use-modal-store'
 
 import { CreateServerModal } from '@/components/modals/create-server-modal'
 import { InviteModal } from '@/components/modals/invite-modal'
@@ -9,8 +10,8 @@ import { CreateChannelModal } from '@/components/modals/create-channel-modal'
 import { LeaveServerModal } from '@/components/modals/leave-server-modal'
 import { DeleteServerModal } from '@/components/modals/delete-server-modal'
 import { DeleteChannelModal } from '@/components/modals/delete-channel-modal'
-import { ModalType, useModal } from '@/hooks/use-modal-store'
 import { EditChannelModal } from '@/components/modals/edit-channel-modal'
+import { MessageFileModal } from '@/components/modals/message-file-modal'
 
 const mapComponents: Record<ModalType, React.ReactElement | string> = {
 	createServer: <CreateServerModal />,
@@ -22,8 +23,8 @@ const mapComponents: Record<ModalType, React.ReactElement | string> = {
 	invite: <InviteModal />,
 	members: <MembersModal />,
 	leaveServer: <LeaveServerModal />,
-	deleteMessage: '',
-	messageFile: ''
+	messageFile: <MessageFileModal />,
+	deleteMessage: ''
 }
 export const ModalProvider = () => {
 	const [isMounted, setIsMounted] = useState(false)
