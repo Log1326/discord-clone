@@ -20,10 +20,11 @@ const roleIconMap: Record<MemberRole, React.ReactNode | null> = {
 }
 export const ServerMember: React.FC<ServerMemberProps> = props => {
 	const { member } = props
-	const { serverId, memberId, channelId } = useParams()
+	const params = useParams()
 	const { push } = useRouter()
 	const icon = roleIconMap[member.role]
-	const onClick = () => push(`/servers/${serverId}/conversations/${member.id}`)
+	const onClick = () =>
+		push(`/servers/${params?.serverId}/conversations/${member.id}`)
 
 	return (
 		<button
@@ -31,7 +32,7 @@ export const ServerMember: React.FC<ServerMemberProps> = props => {
 			className={cn(
 				`group p-2 rounded-md flex items-center gap-x-2 w-full
 			 hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition md-1`,
-				memberId === member?.id && 'bg-zinc-700/20 dark:bg-zinc-700'
+				params?.memberId === member?.id && 'bg-zinc-700/20 dark:bg-zinc-700'
 			)}
 		>
 			<UserAvatar src={member.profile.imageUrl} className='h-8 w-8' />
@@ -39,7 +40,7 @@ export const ServerMember: React.FC<ServerMemberProps> = props => {
 				className={cn(
 					`font-semibold text-sm text-zinc-500 group-hover:text-zinc-600
 					dark:text-zinc-400 dark:group-hover:text-zinc-300 transition`,
-					channelId === member?.id &&
+					params?.channelId === member?.id &&
 						'text-primary dark:text-zinc-200 dark:group-hover:text-white'
 				)}
 			>
