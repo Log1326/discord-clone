@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Member, Message, Profile } from '@prisma/client'
+import { useSocket } from '@/components/providers/socket-provider'
 
 type ChatSocketProps = {
 	addKey: string
@@ -13,38 +14,35 @@ type MessageWithMemberWithProfile = Message & {
 		profile: Profile
 	}
 }
-
+type DataType =
+	| {
+			pages: { items: MessageWithMemberWithProfile[] }[]
+	  }
+	| undefined
 export const useChatSocket = ({
 	addKey,
 	updateKey,
 	queryKey
 }: ChatSocketProps) => {
-	let socket: any
-	// const { socket } = useSocket();
+	const { socket } = useSocket()
 	const queryClient = useQueryClient()
 
 	useEffect(() => {
-		if (!socket) {
-			return
-		}
-
+		if (!socket) return
 		socket.on(updateKey, (message: MessageWithMemberWithProfile) => {
-			queryClient.setQueryData([queryKey], (oldData: any) => {
-				if (!oldData || !oldData.pages || oldData.pages.length === 0) {
+			queryClient.setQueryData([queryKey], (oldData: DataType) => {
+				if (!oldData || !oldData.pages || oldData.pages.length === 0)
 					return oldData
-				}
-
-				const newData = oldData.pages.map((page: any) => {
-					return {
-						...page,
-						items: page.items.map((item: MessageWithMemberWithProfile) => {
-							if (item.id === message.id) {
-								return message
-							}
-							return item
-						})
+				const newData = oldData.pages.map(
+					(page: { items: MessageWithMemberWithProfile[] }) => {
+						return {
+							...page,
+							items: page.items.map((item: MessageWithMemberWithProfile) =>
+								item.id === message.id ? message : item
+							)
+						}
 					}
-				})
+				)
 
 				return {
 					...oldData,
@@ -54,7 +52,7 @@ export const useChatSocket = ({
 		})
 
 		socket.on(addKey, (message: MessageWithMemberWithProfile) => {
-			queryClient.setQueryData([queryKey], (oldData: any) => {
+			queryClient.setQueryData([queryKey], (oldData: DataType) => {
 				if (!oldData || !oldData.pages || oldData.pages.length === 0) {
 					return {
 						pages: [
@@ -64,9 +62,7 @@ export const useChatSocket = ({
 						]
 					}
 				}
-
 				const newData = [...oldData.pages]
-
 				newData[0] = {
 					...newData[0],
 					items: [message, ...newData[0].items]

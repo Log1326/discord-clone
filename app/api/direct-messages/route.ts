@@ -1,6 +1,6 @@
 import { nextError } from '@/lib/nextError'
 import { currentProfile } from '@/lib/current-profile'
-import { Message } from '@prisma/client'
+import { DirectMessage } from '@prisma/client'
 import { db } from '@/lib/db'
 import { NextResponse } from 'next/server'
 
@@ -10,23 +10,23 @@ export async function GET(req: Request) {
 		const profile = await currentProfile()
 		const { searchParams } = new URL(req.url)
 		const cursor = searchParams.get('cursor')
-		const channelId = searchParams.get('channelId')
+		const conversationId = searchParams.get('conversationId')
 		if (!profile) return nextError('Unauthorized')
-		if (!channelId) return nextError('Channel ID Missing')
-		let messages: Message[] = []
+		if (!conversationId) return nextError('Conversation ID Missing')
+		let messages: DirectMessage[] = []
 		if (cursor)
-			messages = await db.message.findMany({
+			messages = await db.directMessage.findMany({
 				take: MESSAGES_BATCH,
 				skip: 1,
 				cursor: { id: cursor },
-				where: { channelId },
+				where: { conversationId },
 				include: { member: { include: { profile: true } } },
 				orderBy: { createdAt: 'desc' }
 			})
 		else
-			messages = await db.message.findMany({
+			messages = await db.directMessage.findMany({
 				take: MESSAGES_BATCH,
-				where: { channelId },
+				where: { conversationId },
 				include: { member: { include: { profile: true } } },
 				orderBy: { createdAt: 'desc' }
 			})
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
 			nextCursor = messages[MESSAGES_BATCH - 1].id
 		return NextResponse.json({ items: messages, nextCursor })
 	} catch (err) {
-		console.log(err, 'GET_ERROR_MESSAGES')
+		console.log(err, 'DIRECT_ERROR_MESSAGES')
 		return nextError('Internal Error')
 	}
 }
