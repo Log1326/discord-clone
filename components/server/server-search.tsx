@@ -39,7 +39,7 @@ export const ServerSearch: React.FC<ServerSearchProps> = props => {
 			if (type === 'member')
 				return router.push(`/servers/${params?.serverId}/conversation/${id}`)
 			if (type === 'channel')
-				return router.push(`/servers/${params.serverId}/channels/${id}`)
+				return router.push(`/servers/${params?.serverId}/channels/${id}`)
 			return null
 		}
 	return (
