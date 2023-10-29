@@ -4,15 +4,22 @@ import { db } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import { getOrCreateConversation } from '@/lib/conversation'
 import { ChatHeader } from '@/components/chat/chat-header'
+import { ChatMessages } from '@/components/chat/chat-messages'
+import { ChatInput } from '@/components/chat/chat-input'
+import { MediaRoom } from '@/components/media-room'
 
 type Params = {
 	params: {
 		memberId: string
 		serverId: string
 	}
+	searchParams: {
+		video?: boolean
+	}
 }
 export default async function MemberIdPage({
-	params: { memberId, serverId }
+	params: { memberId, serverId },
+	searchParams
 }: Params) {
 	const profile = await currentProfile()
 	if (!profile) return redirectToSignIn()
@@ -34,6 +41,30 @@ export default async function MemberIdPage({
 				type='conversation'
 				imageUrl={otherMember.profile.imageUrl}
 			/>
+			{searchParams.video && (
+				<MediaRoom chatId={conversation.id} video={true} audio={true} />
+			)}
+			{!searchParams.video && (
+				<>
+					<ChatMessages
+						name={otherMember.profile.name}
+						member={currentMember}
+						chatId={conversation.id}
+						apiUrl='/api/direct-messages'
+						socketUrl='/api/socket/direct-messages'
+						socketQuery={{ conversationId: conversation.id }}
+						paramKey='conversationId'
+						paramValue={conversation.id}
+						type='conversation'
+					/>
+					<ChatInput
+						apiUrl='/api/socket/direct-messages'
+						query={{ conversationId: conversation.id }}
+						name={otherMember.profile.name}
+						type='conversation'
+					/>
+				</>
+			)}
 		</div>
 	)
 }

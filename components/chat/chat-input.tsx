@@ -9,7 +9,6 @@ import qs from 'query-string'
 import axios from 'axios'
 import { useModal } from '@/hooks/use-modal-store'
 import { EmojiPicker } from '@/components/emoji-picker'
-import { useRouter } from 'next/navigation'
 
 interface ChatInputProps {
 	apiUrl: string
@@ -23,7 +22,6 @@ const formSchema = z.object({
 export const ChatInput: React.FC<ChatInputProps> = props => {
 	const { apiUrl, type, query, name } = props
 	const { onOpen } = useModal()
-	const router = useRouter()
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: { content: '' }
@@ -36,6 +34,7 @@ export const ChatInput: React.FC<ChatInputProps> = props => {
 				query
 			})
 			await axios.post(url, values)
+			form.reset()
 		} catch (err) {
 			console.log(err)
 		}
